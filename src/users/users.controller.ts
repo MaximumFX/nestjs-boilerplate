@@ -35,6 +35,11 @@ import { User } from './domain/user';
 import { UsersService } from './users.service';
 import { RolesGuard } from '../roles/roles.guard';
 import { infinityPagination } from '../utils/infinity-pagination';
+import {
+  ApiPagination,
+  PaginationParams,
+} from '../utils/decorators/pagination-params.decorator';
+import { PaginationOptionsType } from '../utils/types/pagination-options.type';
 
 @ApiBearerAuth()
 @Roles(RoleEnum.admin)
@@ -62,6 +67,7 @@ export class UsersController {
   @ApiOkResponse({
     type: InfinityPaginationResponse(User),
   })
+  @ApiPagination()
   @SerializeOptions({
     groups: ['admin'],
   })
@@ -69,23 +75,15 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   async findAll(
     @Query() query: QueryUserDto,
+    @PaginationParams() pagination: PaginationOptionsType,
   ): Promise<InfinityPaginationResponseDto<User>> {
-    const page = query?.page ?? 1;
-    let limit = query?.limit ?? 10;
-    if (limit > 50) {
-      limit = 50;
-    }
-
     return infinityPagination(
       await this.usersService.findManyWithPagination({
         filterOptions: query?.filters,
         sortOptions: query?.sort,
-        paginationOptions: {
-          page,
-          limit,
-        },
+        paginationOptions: pagination,
       }),
-      { page, limit },
+      pagination,
     );
   }
 

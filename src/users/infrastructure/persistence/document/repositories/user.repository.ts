@@ -8,7 +8,7 @@ import { UserSchemaClass } from '../entities/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { QueryFilter, Model } from 'mongoose';
 import { UserMapper } from '../mappers/user.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { PaginationOptionsType } from '../../../../../utils/types/pagination-options.type';
 
 @Injectable()
 export class UsersDocumentRepository implements UserRepository {
@@ -31,7 +31,7 @@ export class UsersDocumentRepository implements UserRepository {
   }: {
     filterOptions?: FilterUserDto | null;
     sortOptions?: SortUserDto[] | null;
-    paginationOptions: IPaginationOptions;
+    paginationOptions: PaginationOptionsType;
   }): Promise<User[]> {
     const where: QueryFilter<UserSchemaClass> = {};
     if (filterOptions?.roles?.length) {

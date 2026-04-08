@@ -29,7 +29,11 @@ import {
   InfinityPaginationResponseDto,
 } from '../utils/dto/infinity-pagination-response.dto';
 import { infinityPagination } from '../utils/infinity-pagination';
-import { FindAll<%= h.inflection.transform(name, ['pluralize']) %>Dto } from './dto/find-all-<%= h.inflection.transform(name, ['pluralize', 'underscore', 'dasherize']) %>.dto';
+import {
+  ApiPagination,
+  PaginationParams,
+} from '../utils/decorators/pagination-params.decorator';
+import { PaginationOptionsType } from '../utils/types/pagination-options.type';
 
 @ApiTags('<%= h.inflection.transform(name, ['pluralize', 'humanize']) %>')
 @ApiBearerAuth()
@@ -53,23 +57,15 @@ export class <%= h.inflection.transform(name, ['pluralize']) %>Controller {
   @ApiOkResponse({
     type: InfinityPaginationResponse(<%= name %>),
   })
+  @ApiPagination()
   async findAll(
-    @Query() query: FindAll<%= h.inflection.transform(name, ['pluralize']) %>Dto,
+    @PaginationParams() pagination: PaginationOptionsType,
   ): Promise<InfinityPaginationResponseDto<<%= name %>>> {
-    const page = query?.page ?? 1;
-    let limit = query?.limit ?? 10;
-    if (limit > 50) {
-      limit = 50;
-    }
-
     return infinityPagination(
       await this.<%= h.inflection.camelize(h.inflection.pluralize(name), true) %>Service.findAllWithPagination({
-        paginationOptions: {
-          page,
-          limit,
-        },
+        paginationOptions: pagination,
       }),
-      { page, limit },
+      pagination,
     );
   }
 

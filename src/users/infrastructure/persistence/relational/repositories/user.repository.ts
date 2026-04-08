@@ -8,7 +8,7 @@ import { FilterUserDto, SortUserDto } from '../../../../dto/query-user.dto';
 import { User } from '../../../../domain/user';
 import { UserRepository } from '../../user.repository';
 import { UserMapper } from '../mappers/user.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { PaginationOptionsType } from '../../../../../utils/types/pagination-options.type';
 
 @Injectable()
 export class UsersRelationalRepository implements UserRepository {
@@ -32,7 +32,7 @@ export class UsersRelationalRepository implements UserRepository {
   }: {
     filterOptions?: FilterUserDto | null;
     sortOptions?: SortUserDto[] | null;
-    paginationOptions: IPaginationOptions;
+    paginationOptions: PaginationOptionsType;
   }): Promise<User[]> {
     const where: FindOptionsWhere<UserEntity> = {};
     if (filterOptions?.roles?.length) {

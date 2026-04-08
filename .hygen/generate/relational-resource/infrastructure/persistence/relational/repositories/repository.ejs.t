@@ -9,7 +9,7 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { <%= name %> } from '../../../../domain/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>';
 import { <%= name %>Repository } from '../../<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>.repository';
 import { <%= name %>Mapper } from '../mappers/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { PaginationOptionsType } from '../../../../../utils/types/pagination-options.type';
 
 @Injectable()
 export class <%= name %>RelationalRepository implements <%= name %>Repository {
@@ -29,7 +29,7 @@ export class <%= name %>RelationalRepository implements <%= name %>Repository {
   async findAllWithPagination({
     paginationOptions,
   }: {
-    paginationOptions: IPaginationOptions;
+    paginationOptions: PaginationOptionsType;
   }): Promise<<%= name %>[]> {
     const entities = await this.<%= h.inflection.camelize(name, true) %>Repository.find({
       skip: (paginationOptions.page - 1) * paginationOptions.limit,

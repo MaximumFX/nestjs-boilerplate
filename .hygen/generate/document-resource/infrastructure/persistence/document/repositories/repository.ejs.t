@@ -9,7 +9,7 @@ import { <%= name %>SchemaClass } from '../entities/<%= h.inflection.transform(n
 import { <%= name %>Repository } from '../../<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>.repository';
 import { <%= name %> } from '../../../../domain/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>';
 import { <%= name %>Mapper } from '../mappers/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { PaginationOptionsType } from '../../../../../utils/types/pagination-options.type';
 
 @Injectable()
 export class <%= name %>DocumentRepository implements <%= name %>Repository {
@@ -28,7 +28,7 @@ export class <%= name %>DocumentRepository implements <%= name %>Repository {
   async findAllWithPagination({
     paginationOptions,
   }: {
-    paginationOptions: IPaginationOptions;
+    paginationOptions: PaginationOptionsType;
   }): Promise<<%= name %>[]> {
     const entityObjects = await this.<%= h.inflection.camelize(name, true) %>Model
       .find()
