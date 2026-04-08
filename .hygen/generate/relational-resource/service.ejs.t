@@ -37,10 +37,7 @@ export class <%= h.inflection.transform(name, ['pluralize']) %>Service {
     paginationOptions: PaginationOptionsType;
   }) {
     return this.<%= h.inflection.camelize(name, true) %>Repository.findAllWithPagination({
-      paginationOptions: {
-        page: paginationOptions.page,
-        limit: paginationOptions.limit,
-      },
+      paginationOptions,
     });
   }
 
