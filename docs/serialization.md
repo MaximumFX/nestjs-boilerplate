@@ -41,9 +41,8 @@ export class User extends EntityRelationalHelper {
 
    // Some code here...
 
-   @ApiBearerAuth()
+   @SecuredEndpoint()
    @Roles(RoleEnum.admin)
-   @UseGuards(AuthGuard('jwt'), RolesGuard)
    @Controller({
      path: 'users',
      version: '1',
@@ -53,6 +52,7 @@ export class User extends EntityRelationalHelper {
 
      // Some code here...
 
+     @Public()
      @SerializeOptions({
        groups: ['admin'],
      })

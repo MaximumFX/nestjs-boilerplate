@@ -3,8 +3,9 @@ to: src/<%= h.inflection.transform(name, ['pluralize', 'underscore', 'dasherize'
 ---
 import { DeepPartial } from '../../../utils/types/deep-partial.type';
 import { NullableType } from '../../../utils/types/nullable.type';
-import { IPaginationOptions } from '../../../utils/types/pagination-options';
+import { PaginationOptionsType } from '../../../utils/types/pagination-options.type';
 import { <%= name %> } from '../../domain/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>';
+import { CountedResourceType } from '../../../utils/types/counted-resource.type';
 
 export abstract class <%= name %>Repository {
   abstract create(
@@ -14,8 +15,8 @@ export abstract class <%= name %>Repository {
   abstract findAllWithPagination({
     paginationOptions,
   }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<<%= name %>[]>;
+    paginationOptions: PaginationOptionsType;
+  }): Promise<CountedResourceType<<%= name %>>>;
 
   abstract findById(id: <%= name %>['id']): Promise<NullableType<<%= name %>>>;
 

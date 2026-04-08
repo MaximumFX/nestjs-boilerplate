@@ -397,19 +397,9 @@ export class AuthService {
 
   async update(
     userJwtPayload: JwtPayloadType,
+    currentUser: User,
     userDto: AuthUpdateDto,
   ): Promise<NullableType<User>> {
-    const currentUser = await this.usersService.findById(userJwtPayload.id);
-
-    if (!currentUser) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          user: 'userNotFound',
-        },
-      });
-    }
-
     if (userDto.password) {
       if (!userDto.oldPassword) {
         throw new UnprocessableEntityException({

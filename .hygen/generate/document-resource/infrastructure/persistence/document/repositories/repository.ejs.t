@@ -9,7 +9,8 @@ import { <%= name %>SchemaClass } from '../entities/<%= h.inflection.transform(n
 import { <%= name %>Repository } from '../../<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>.repository';
 import { <%= name %> } from '../../../../domain/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>';
 import { <%= name %>Mapper } from '../mappers/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { PaginationOptionsType } from '../../../../../utils/types/pagination-options.type';
+import { CountedResourceType } from '../../../../../utils/types/counted-resource.type';
 
 @Injectable()
 export class <%= name %>DocumentRepository implements <%= name %>Repository {
@@ -28,16 +29,18 @@ export class <%= name %>DocumentRepository implements <%= name %>Repository {
   async findAllWithPagination({
     paginationOptions,
   }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<<%= name %>[]> {
+    paginationOptions: PaginationOptionsType;
+  }): Promise<CountedResourceType<<%= name %>>> {
     const entityObjects = await this.<%= h.inflection.camelize(name, true) %>Model
       .find()
-      .skip((paginationOptions.page - 1) * paginationOptions.limit)
+      .skip(paginationOptions.skip)
       .limit(paginationOptions.limit);
+    const count = await this.<%= h.inflection.camelize(name, true) %>Model.countDocuments();
 
-    return entityObjects.map((entityObject) =>
-      <%= name %>Mapper.toDomain(entityObject),
-    );
+    return {
+      entities: entityObjects.map((entityObject) => <%= name %>Mapper.toDomain(entityObject)),
+      count,
+    };
   }
 
   async findById(id: <%= name %>['id']): Promise<NullableType<<%= name %>>> {

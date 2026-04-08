@@ -9,7 +9,8 @@ import { NullableType } from '../../../../../utils/types/nullable.type';
 import { <%= name %> } from '../../../../domain/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>';
 import { <%= name %>Repository } from '../../<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>.repository';
 import { <%= name %>Mapper } from '../mappers/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { PaginationOptionsType } from '../../../../../utils/types/pagination-options.type';
+import { CountedResourceType } from '../../../../../utils/types/counted-resource.type';
 
 @Injectable()
 export class <%= name %>RelationalRepository implements <%= name %>Repository {
@@ -29,14 +30,17 @@ export class <%= name %>RelationalRepository implements <%= name %>Repository {
   async findAllWithPagination({
     paginationOptions,
   }: {
-    paginationOptions: IPaginationOptions;
-  }): Promise<<%= name %>[]> {
-    const entities = await this.<%= h.inflection.camelize(name, true) %>Repository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
+    paginationOptions: PaginationOptionsType;
+  }): Promise<CountedResourceType<<%= name %>>> {
+    const [entities, count] = await this.<%= h.inflection.camelize(name, true) %>Repository.findAndCount({
+      skip: paginationOptions.skip,
       take: paginationOptions.limit,
     });
 
-    return entities.map((entity) => <%= name %>Mapper.toDomain(entity));
+    return {
+      entities: entities.map((entity) => <%= name %>Mapper.toDomain(entity)),
+      count,
+    };
   }
 
   async findById(id: <%= name %>['id']): Promise<NullableType<<%= name %>>> {

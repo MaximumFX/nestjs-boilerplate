@@ -5,23 +5,26 @@ import {
   Post,
   Response,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
-  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
   ApiExcludeEndpoint,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { FilesLocalService } from './files.service';
 import { FileResponseDto } from './dto/file-response.dto';
+import {
+  Protected,
+  Public,
+  SecuredEndpoint,
+} from '../../../../auth/auth.decorator';
 
 @ApiTags('Files')
+@SecuredEndpoint()
 @Controller({
   path: 'files',
   version: '1',
@@ -32,8 +35,7 @@ export class FilesLocalController {
   @ApiCreatedResponse({
     type: FileResponseDto,
   })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @Protected()
   @Post('upload')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -54,6 +56,7 @@ export class FilesLocalController {
     return this.filesService.create(file);
   }
 
+  @Public()
   @Get(':path')
   @ApiExcludeEndpoint()
   download(@Param('path') path, @Response() response) {

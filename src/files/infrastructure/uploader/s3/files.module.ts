@@ -18,6 +18,9 @@ import { AllConfigType } from '../../../../config/config.type';
 import { DatabaseConfig } from '../../../../database/config/database-config.type';
 import databaseConfig from '../../../../database/config/database.config';
 
+import { RolesGuard } from '../../../../roles/roles.guard';
+import { ApiKeyGuard } from '../../../../auth/guards/api-key.guard';
+import { JwtAuthGuard } from '../../../../auth/guards/jwt-auth.guard';
 // <database-block>
 const infrastructurePersistenceModule = (databaseConfig() as DatabaseConfig)
   .isDocumentDatabase
@@ -84,7 +87,7 @@ const infrastructurePersistenceModule = (databaseConfig() as DatabaseConfig)
     }),
   ],
   controllers: [FilesS3Controller],
-  providers: [FilesS3Service],
+  providers: [FilesS3Service, ApiKeyGuard, JwtAuthGuard, RolesGuard],
   exports: [FilesS3Service],
 })
 export class FilesS3Module {}
