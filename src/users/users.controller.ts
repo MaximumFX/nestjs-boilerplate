@@ -1,21 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
-  Query,
-  HttpStatus,
+  Get,
   HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
   SerializeOptions,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
-  ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiParam,
@@ -23,7 +21,6 @@ import {
 } from '@nestjs/swagger';
 import { Roles } from '../roles/roles.decorator';
 import { RoleEnum } from '../roles/roles.enum';
-import { AuthGuard } from '@nestjs/passport';
 
 import {
   InfinityPaginationResponse,
@@ -33,17 +30,16 @@ import { NullableType } from '../utils/types/nullable.type';
 import { QueryUserDto } from './dto/query-user.dto';
 import { User } from './domain/user';
 import { UsersService } from './users.service';
-import { RolesGuard } from '../roles/roles.guard';
 import { infinityPagination } from '../utils/infinity-pagination';
+import { Protected, SecuredEndpoint } from '../auth/auth.decorator';
 import {
   ApiPagination,
   PaginationParams,
 } from '../utils/decorators/pagination-params.decorator';
 import { PaginationOptionsType } from '../utils/types/pagination-options.type';
 
-@ApiBearerAuth()
+@SecuredEndpoint()
 @Roles(RoleEnum.admin)
-@UseGuards(AuthGuard('jwt'), RolesGuard)
 @ApiTags('Users')
 @Controller({
   path: 'users',
@@ -52,6 +48,7 @@ import { PaginationOptionsType } from '../utils/types/pagination-options.type';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Protected()
   @ApiCreatedResponse({
     type: User,
   })
@@ -64,6 +61,7 @@ export class UsersController {
     return this.usersService.create(createProfileDto);
   }
 
+  @Protected()
   @ApiOkResponse({
     type: InfinityPaginationResponse(User),
   })

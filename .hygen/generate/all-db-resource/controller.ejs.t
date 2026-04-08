@@ -9,26 +9,18 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
-  Query,
 } from '@nestjs/common';
 import { <%= h.inflection.transform(name, ['pluralize']) %>Service } from './<%= h.inflection.transform(name, ['pluralize', 'underscore', 'dasherize']) %>.service';
 import { Create<%= name %>Dto } from './dto/create-<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>.dto';
 import { Update<%= name %>Dto } from './dto/update-<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>.dto';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { <%= name %> } from './domain/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>';
-import { AuthGuard } from '@nestjs/passport';
 import {
   InfinityPaginationResponse,
   InfinityPaginationResponseDto,
 } from '../utils/dto/infinity-pagination-response.dto';
 import { infinityPagination } from '../utils/infinity-pagination';
+import { Protected, Public, SecuredEndpoint } from '../auth/auth.decorator';
 import {
   ApiPagination,
   PaginationParams,
@@ -36,8 +28,7 @@ import {
 import { PaginationOptionsType } from '../utils/types/pagination-options.type';
 
 @ApiTags('<%= h.inflection.transform(name, ['pluralize', 'humanize']) %>')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@SecuredEndpoint()
 @Controller({
   path: '<%= h.inflection.transform(name, ['pluralize', 'underscore', 'dasherize']) %>',
   version: '1',
@@ -45,6 +36,7 @@ import { PaginationOptionsType } from '../utils/types/pagination-options.type';
 export class <%= h.inflection.transform(name, ['pluralize']) %>Controller {
   constructor(private readonly <%= h.inflection.camelize(h.inflection.pluralize(name), true) %>Service: <%= h.inflection.transform(name, ['pluralize']) %>Service) {}
 
+  @Protected()
   @Post()
   @ApiCreatedResponse({
     type: <%= name %>,
@@ -53,6 +45,7 @@ export class <%= h.inflection.transform(name, ['pluralize']) %>Controller {
     return this.<%= h.inflection.camelize(h.inflection.pluralize(name), true) %>Service.create(create<%= name %>Dto);
   }
 
+  @Public()
   @Get()
   @ApiOkResponse({
     type: InfinityPaginationResponse(<%= name %>),
@@ -69,6 +62,7 @@ export class <%= h.inflection.transform(name, ['pluralize']) %>Controller {
     );
   }
 
+  @Public()
   @Get(':id')
   @ApiParam({
     name: 'id',
@@ -82,6 +76,7 @@ export class <%= h.inflection.transform(name, ['pluralize']) %>Controller {
     return this.<%= h.inflection.camelize(h.inflection.pluralize(name), true) %>Service.findById(id);
   }
 
+  @Protected()
   @Patch(':id')
   @ApiParam({
     name: 'id',
@@ -98,6 +93,7 @@ export class <%= h.inflection.transform(name, ['pluralize']) %>Controller {
     return this.<%= h.inflection.camelize(h.inflection.pluralize(name), true) %>Service.update(id, update<%= name %>Dto);
   }
 
+  @Protected()
   @Delete(':id')
   @ApiParam({
     name: 'id',

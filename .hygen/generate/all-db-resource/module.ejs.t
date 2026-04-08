@@ -12,6 +12,10 @@ import databaseConfig from '../database/config/database.config';
 import { DatabaseConfig } from '../database/config/database-config.type';
 import { Document<%= name %>PersistenceModule } from './infrastructure/persistence/document/document-persistence.module';
 
+
+import { RolesGuard } from '../roles/roles.guard';
+import { ApiKeyGuard } from '../auth/guards/api-key.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 const infrastructurePersistenceModule = (databaseConfig() as DatabaseConfig)
   .isDocumentDatabase
   ? Document<%= name %>PersistenceModule
@@ -23,7 +27,12 @@ const infrastructurePersistenceModule = (databaseConfig() as DatabaseConfig)
     infrastructurePersistenceModule,
   ],
   controllers: [<%= h.inflection.transform(name, ['pluralize']) %>Controller],
-  providers: [<%= h.inflection.transform(name, ['pluralize']) %>Service],
+  providers: [
+    <%= h.inflection.transform(name, ['pluralize']) %>Service,
+    ApiKeyGuard,
+    JwtAuthGuard,
+    RolesGuard,
+  ],
   exports: [<%= h.inflection.transform(name, ['pluralize']) %>Service, infrastructurePersistenceModule],
 })
 export class <%= h.inflection.transform(name, ['pluralize']) %>Module {}

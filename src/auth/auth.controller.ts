@@ -11,7 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { AuthEmailLoginDto } from './dto/auth-email-login.dto';
 import { AuthForgotPasswordDto } from './dto/auth-forgot-password.dto';
 import { AuthConfirmEmailDto } from './dto/auth-confirm-email.dto';
@@ -29,8 +29,11 @@ import { JwtPayloadType } from './strategies/types/jwt-payload.type';
 import { CurrentUser } from '../utils/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../utils/decorators/authenticated-user.decorator';
 import { JwtRefreshPayloadType } from './strategies/types/jwt-refresh-payload.type';
+import { ApiKeyGuard } from './guards/api-key.guard';
 
 @ApiTags('Auth')
+@ApiSecurity('x-api-key')
+@UseGuards(ApiKeyGuard)
 @Controller({
   path: 'auth',
   version: '1',
@@ -128,7 +131,7 @@ export class AuthController {
     });
   }
 
-  @Protected()
+  @Authenticated()
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
