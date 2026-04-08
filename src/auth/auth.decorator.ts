@@ -7,6 +7,9 @@ import { AuthenticatedUserGuard } from './guards/authenticated-user.guard';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 
+/**
+ * Decorator to secure endpoints with API key authentication.
+ */
 export function SecuredEndpoint() {
   return applyDecorators(
     ApiSecurity('x-api-key'),
@@ -14,14 +17,23 @@ export function SecuredEndpoint() {
   );
 }
 
+/**
+ * Marks a route as public, allowing unauthenticated access.
+ */
 export function Public() {
   return SetMetadata(IS_PUBLIC_KEY, true);
 }
 
+/**
+ * Marks a route as protected, adding optional authentication.
+ */
 export function Protected() {
   return ApiBearerAuth();
 }
 
+/**
+ * Marks a route as authenticated, requiring a valid JWT token.
+ */
 export function Authenticated() {
   return applyDecorators(ApiBearerAuth(), UseGuards(AuthenticatedUserGuard));
 }
