@@ -41,6 +41,14 @@ async function bootstrap() {
     .setDescription('API docs')
     .setVersion('1.0')
     .addBearerAuth()
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'x-api-key',
+        in: 'header',
+      },
+      'x-api-key',
+    )
     .addGlobalParameters({
       in: 'header',
       required: false,
