@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { QueryFilter, Model } from 'mongoose';
 import { UserMapper } from '../mappers/user.mapper';
 import { PaginationOptionsType } from '../../../../../utils/types/pagination-options.type';
+import { CountedResourceType } from '../../../../../utils/types/counted-resource.type';
 
 @Injectable()
 export class UsersDocumentRepository implements UserRepository {
@@ -32,7 +33,7 @@ export class UsersDocumentRepository implements UserRepository {
     filterOptions?: FilterUserDto | null;
     sortOptions?: SortUserDto[] | null;
     paginationOptions: PaginationOptionsType;
-  }): Promise<User[]> {
+  }): Promise<CountedResourceType<User>> {
     const where: QueryFilter<UserSchemaClass> = {};
     if (filterOptions?.roles?.length) {
       where['role._id'] = {
@@ -54,8 +55,14 @@ export class UsersDocumentRepository implements UserRepository {
       )
       .skip(paginationOptions.skip)
       .limit(paginationOptions.limit);
+    const count = await this.usersModel.countDocuments();
 
-    return userObjects.map((userObject) => UserMapper.toDomain(userObject));
+    return {
+      entities: userObjects.map((userObject) =>
+        UserMapper.toDomain(userObject),
+      ),
+      count,
+    };
   }
 
   async findById(id: User['id']): Promise<NullableType<User>> {
