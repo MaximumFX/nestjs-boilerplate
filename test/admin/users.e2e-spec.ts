@@ -10,6 +10,7 @@ describe('Users Module', () => {
   beforeAll(async () => {
     await request(app)
       .post('/api/v1/auth/email/login')
+      .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
       .send({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD })
       .then(({ body }) => {
         apiToken = body.token;
@@ -26,6 +27,7 @@ describe('Users Module', () => {
     beforeAll(async () => {
       await request(app)
         .post('/api/v1/auth/email/register')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({
           email: newUserEmail,
           password: newUserPassword,
@@ -35,6 +37,7 @@ describe('Users Module', () => {
 
       await request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserEmail, password: newUserPassword })
         .then(({ body }) => {
           newUser = body.user;
@@ -45,6 +48,7 @@ describe('Users Module', () => {
       it('should change password for existing user: /api/v1/users/:id (PATCH)', () => {
         return request(app)
           .patch(`/api/v1/users/${newUser.id}`)
+          .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
           .auth(apiToken, {
             type: 'bearer',
           })
@@ -59,6 +63,7 @@ describe('Users Module', () => {
         it('should login with changed password: /api/v1/auth/email/login (POST)', () => {
           return request(app)
             .post('/api/v1/auth/email/login')
+            .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
             .send({
               email: newUserChangedEmail,
               password: newUserChangedPassword,
@@ -80,6 +85,7 @@ describe('Users Module', () => {
       it('should fail to create new user with invalid email: /api/v1/users (POST)', () => {
         return request(app)
           .post(`/api/v1/users`)
+          .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
           .auth(apiToken, {
             type: 'bearer',
           })
@@ -90,6 +96,7 @@ describe('Users Module', () => {
       it('should successfully create new user: /api/v1/users (POST)', () => {
         return request(app)
           .post(`/api/v1/users`)
+          .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
           .auth(apiToken, {
             type: 'bearer',
           })
@@ -112,6 +119,7 @@ describe('Users Module', () => {
         it('should successfully login via created by admin user: /api/v1/auth/email/login (GET)', () => {
           return request(app)
             .post('/api/v1/auth/email/login')
+            .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
             .send({
               email: newUserByAdminEmail,
               password: newUserByAdminPassword,
@@ -130,6 +138,7 @@ describe('Users Module', () => {
       it('should get list of users: /api/v1/users (GET)', () => {
         return request(app)
           .get(`/api/v1/users`)
+          .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
           .auth(apiToken, {
             type: 'bearer',
           })

@@ -18,6 +18,7 @@ describe('Auth Module', () => {
   describe('Registration', () => {
     it('should fail with exists email: /api/v1/auth/email/register (POST)', () => {
       return request(app)
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .post('/api/v1/auth/email/register')
         .send({
           email: TESTER_EMAIL,
@@ -33,6 +34,7 @@ describe('Auth Module', () => {
 
     it('should successfully: /api/v1/auth/email/register (POST)', async () => {
       return request(app)
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .post('/api/v1/auth/email/register')
         .send({
           email: newUserEmail,
@@ -46,6 +48,7 @@ describe('Auth Module', () => {
     describe('Login', () => {
       it('should successfully with unconfirmed email: /api/v1/auth/email/login (POST)', () => {
         return request(app)
+          .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
           .post('/api/v1/auth/email/login')
           .send({ email: newUserEmail, password: newUserPassword })
           .expect(200)
@@ -59,6 +62,7 @@ describe('Auth Module', () => {
       it('should successfully: /api/v1/auth/email/confirm (POST)', async () => {
         const hash = await request(mail)
           .get('/email')
+          .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
           .then(({ body }) =>
             body
               .find(
@@ -72,6 +76,7 @@ describe('Auth Module', () => {
 
         return request(app)
           .post('/api/v1/auth/email/confirm')
+          .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
           .send({
             hash,
           })
@@ -81,6 +86,7 @@ describe('Auth Module', () => {
       it('should fail for already confirmed email: /api/v1/auth/email/confirm (POST)', async () => {
         const hash = await request(mail)
           .get('/email')
+          .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
           .then(({ body }) =>
             body
               .find(
@@ -94,6 +100,7 @@ describe('Auth Module', () => {
 
         return request(app)
           .post('/api/v1/auth/email/confirm')
+          .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
           .send({
             hash,
           })
@@ -106,6 +113,7 @@ describe('Auth Module', () => {
     it('should successfully for user with confirmed email: /api/v1/auth/email/login (POST)', () => {
       return request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserEmail, password: newUserPassword })
         .expect(200)
         .expect(({ body }) => {
@@ -125,6 +133,7 @@ describe('Auth Module', () => {
     beforeAll(async () => {
       await request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserEmail, password: newUserPassword })
         .then(({ body }) => {
           newUserApiToken = body.token;
@@ -134,6 +143,7 @@ describe('Auth Module', () => {
     it('should retrieve your own profile: /api/v1/auth/me (GET)', async () => {
       await request(app)
         .get('/api/v1/auth/me')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .auth(newUserApiToken, {
           type: 'bearer',
         })
@@ -149,11 +159,13 @@ describe('Auth Module', () => {
     it('should get new refresh token: /api/v1/auth/refresh (POST)', async () => {
       let newUserRefreshToken = await request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserEmail, password: newUserPassword })
         .then(({ body }) => body.refreshToken);
 
       newUserRefreshToken = await request(app)
         .post('/api/v1/auth/refresh')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .auth(newUserRefreshToken, {
           type: 'bearer',
         })
@@ -162,6 +174,7 @@ describe('Auth Module', () => {
 
       await request(app)
         .post('/api/v1/auth/refresh')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .auth(newUserRefreshToken, {
           type: 'bearer',
         })
@@ -176,11 +189,13 @@ describe('Auth Module', () => {
     it('should fail on the second attempt to refresh token with the same token: /api/v1/auth/refresh (POST)', async () => {
       const newUserRefreshToken = await request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserEmail, password: newUserPassword })
         .then(({ body }) => body.refreshToken);
 
       await request(app)
         .post('/api/v1/auth/refresh')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .auth(newUserRefreshToken, {
           type: 'bearer',
         })
@@ -188,6 +203,7 @@ describe('Auth Module', () => {
 
       await request(app)
         .post('/api/v1/auth/refresh')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .auth(newUserRefreshToken, {
           type: 'bearer',
         })
@@ -200,11 +216,13 @@ describe('Auth Module', () => {
       const newUserNewPassword = 'new-secret';
       const newUserApiToken = await request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserEmail, password: newUserPassword })
         .then(({ body }) => body.token);
 
       await request(app)
         .patch('/api/v1/auth/me')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .auth(newUserApiToken, {
           type: 'bearer',
         })
@@ -216,6 +234,7 @@ describe('Auth Module', () => {
 
       await request(app)
         .patch('/api/v1/auth/me')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .auth(newUserApiToken, {
           type: 'bearer',
         })
@@ -228,6 +247,7 @@ describe('Auth Module', () => {
 
       await request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserEmail, password: newUserNewPassword })
         .expect(200)
         .expect(({ body }) => {
@@ -236,6 +256,7 @@ describe('Auth Module', () => {
 
       await request(app)
         .patch('/api/v1/auth/me')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .auth(newUserApiToken, {
           type: 'bearer',
         })
@@ -252,6 +273,7 @@ describe('Auth Module', () => {
 
       await request(app)
         .post('/api/v1/auth/email/register')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({
           email: newUserEmail,
           password: newUserPassword,
@@ -262,11 +284,13 @@ describe('Auth Module', () => {
 
       const newUserApiToken = await request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserEmail, password: newUserPassword })
         .then(({ body }) => body.token);
 
       await request(app)
         .patch('/api/v1/auth/me')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .auth(newUserApiToken, {
           type: 'bearer',
         })
@@ -277,6 +301,7 @@ describe('Auth Module', () => {
 
       const hash = await request(mail)
         .get('/email')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .then(({ body }) =>
           body
             .find((letter) => {
@@ -291,6 +316,7 @@ describe('Auth Module', () => {
 
       await request(app)
         .get('/api/v1/auth/me')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .auth(newUserApiToken, {
           type: 'bearer',
         })
@@ -301,11 +327,13 @@ describe('Auth Module', () => {
 
       await request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserNewEmail, password: newUserPassword })
         .expect(422);
 
       await request(app)
         .post('/api/v1/auth/email/confirm/new')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({
           hash,
         })
@@ -313,6 +341,7 @@ describe('Auth Module', () => {
 
       await request(app)
         .get('/api/v1/auth/me')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .auth(newUserApiToken, {
           type: 'bearer',
         })
@@ -323,6 +352,7 @@ describe('Auth Module', () => {
 
       await request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserNewEmail, password: newUserPassword })
         .expect(200);
     });
@@ -330,6 +360,7 @@ describe('Auth Module', () => {
     it('should delete profile successfully: /api/v1/auth/me (DELETE)', async () => {
       const newUserApiToken = await request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserEmail, password: newUserPassword })
         .then(({ body }) => body.token);
 
@@ -339,6 +370,7 @@ describe('Auth Module', () => {
 
       return request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: newUserEmail, password: newUserPassword })
         .expect(422);
     });

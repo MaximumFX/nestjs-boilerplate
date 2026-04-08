@@ -8,6 +8,7 @@ describe('Auth', () => {
     it('should successfully login via /api/v1/auth/email/login (POST)', () => {
       return request(app)
         .post('/api/v1/auth/email/login')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD })
         .expect(200)
         .expect(({ body }) => {
