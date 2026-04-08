@@ -364,9 +364,12 @@ describe('Auth Module', () => {
         .send({ email: newUserEmail, password: newUserPassword })
         .then(({ body }) => body.token);
 
-      await request(app).delete('/api/v1/auth/me').auth(newUserApiToken, {
-        type: 'bearer',
-      });
+      await request(app)
+        .delete('/api/v1/auth/me')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
+        .auth(newUserApiToken, {
+          type: 'bearer',
+        });
 
       return request(app)
         .post('/api/v1/auth/email/login')
