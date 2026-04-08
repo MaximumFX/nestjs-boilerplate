@@ -1,18 +1,17 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
-  Request,
-  Post,
-  UseGuards,
   Patch,
-  Delete,
+  Post,
   SerializeOptions,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthEmailLoginDto } from './dto/auth-email-login.dto';
 import { AuthForgotPasswordDto } from './dto/auth-forgot-password.dto';
 import { AuthConfirmEmailDto } from './dto/auth-confirm-email.dto';
@@ -24,6 +23,12 @@ import { LoginResponseDto } from './dto/login-response.dto';
 import { NullableType } from '../utils/types/nullable.type';
 import { User } from '../users/domain/user';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
+import { Authenticated, Protected, Public } from './auth.decorator';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtPayloadType } from './strategies/types/jwt-payload.type';
+import { CurrentUser } from '../utils/decorators/current-user.decorator';
+import { AuthenticatedUser } from '../utils/decorators/authenticated-user.decorator';
+import { JwtRefreshPayloadType } from './strategies/types/jwt-refresh-payload.type';
 
 @ApiTags('Auth')
 @Controller({
@@ -37,6 +42,7 @@ export class AuthController {
     groups: ['me'],
   })
   @Post('email/login')
+  @Public()
   @ApiOkResponse({
     type: LoginResponseDto,
   })
@@ -46,12 +52,14 @@ export class AuthController {
   }
 
   @Post('email/register')
+  @Public()
   @HttpCode(HttpStatus.NO_CONTENT)
   async register(@Body() createUserDto: AuthRegisterLoginDto): Promise<void> {
     return this.service.register(createUserDto);
   }
 
   @Post('email/confirm')
+  @Public()
   @HttpCode(HttpStatus.NO_CONTENT)
   async confirmEmail(
     @Body() confirmEmailDto: AuthConfirmEmailDto,
@@ -60,6 +68,7 @@ export class AuthController {
   }
 
   @Post('email/confirm/new')
+  @Public()
   @HttpCode(HttpStatus.NO_CONTENT)
   async confirmNewEmail(
     @Body() confirmEmailDto: AuthConfirmEmailDto,
@@ -68,6 +77,7 @@ export class AuthController {
   }
 
   @Post('forgot/password')
+  @Public()
   @HttpCode(HttpStatus.NO_CONTENT)
   async forgotPassword(
     @Body() forgotPasswordDto: AuthForgotPasswordDto,
@@ -76,6 +86,7 @@ export class AuthController {
   }
 
   @Post('reset/password')
+  @Public()
   @HttpCode(HttpStatus.NO_CONTENT)
   resetPassword(@Body() resetPasswordDto: AuthResetPasswordDto): Promise<void> {
     return this.service.resetPassword(
@@ -84,21 +95,21 @@ export class AuthController {
     );
   }
 
-  @ApiBearerAuth()
+  @Authenticated()
+  @UseGuards(JwtAuthGuard)
   @SerializeOptions({
     groups: ['me'],
   })
   @Get('me')
-  @UseGuards(AuthGuard('jwt'))
   @ApiOkResponse({
     type: User,
   })
   @HttpCode(HttpStatus.OK)
-  public me(@Request() request): Promise<NullableType<User>> {
-    return this.service.me(request.user);
+  public me(@CurrentUser() user: JwtPayloadType): Promise<NullableType<User>> {
+    return this.service.me(user);
   }
 
-  @ApiBearerAuth()
+  @Protected()
   @ApiOkResponse({
     type: RefreshResponseDto,
   })
@@ -108,45 +119,48 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
   @HttpCode(HttpStatus.OK)
-  public refresh(@Request() request): Promise<RefreshResponseDto> {
+  public refresh(
+    @CurrentUser() user: JwtRefreshPayloadType,
+  ): Promise<RefreshResponseDto> {
     return this.service.refreshToken({
-      sessionId: request.user.sessionId,
-      hash: request.user.hash,
+      sessionId: user.sessionId,
+      hash: user.hash,
     });
   }
 
-  @ApiBearerAuth()
+  @Protected()
   @Post('logout')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  public async logout(@Request() request): Promise<void> {
+  public async logout(@CurrentUser() user: JwtPayloadType): Promise<void> {
     await this.service.logout({
-      sessionId: request.user.sessionId,
+      sessionId: user.sessionId,
     });
   }
 
-  @ApiBearerAuth()
+  @Authenticated()
   @SerializeOptions({
     groups: ['me'],
   })
   @Patch('me')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: User,
   })
-  public update(
-    @Request() request,
+  public async update(
     @Body() userDto: AuthUpdateDto,
+    @CurrentUser() currentUser: JwtPayloadType,
+    @AuthenticatedUser() user: User,
   ): Promise<NullableType<User>> {
-    return this.service.update(request.user, userDto);
+    return await this.service.update(currentUser, user, userDto);
   }
 
-  @ApiBearerAuth()
+  @Authenticated()
   @Delete('me')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  public async delete(@Request() request): Promise<void> {
-    return this.service.softDelete(request.user);
+  public async delete(@AuthenticatedUser() user: User): Promise<void> {
+    return this.service.softDelete(user);
   }
 }
