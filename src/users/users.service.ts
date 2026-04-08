@@ -18,6 +18,7 @@ import { FileType } from '../files/domain/file';
 import { Role } from '../roles/domain/role';
 import { Status } from '../statuses/domain/status';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CountedResourceType } from '../utils/types/counted-resource.type';
 
 @Injectable()
 export class UsersService {
@@ -136,7 +137,7 @@ export class UsersService {
     filterOptions?: FilterUserDto | null;
     sortOptions?: SortUserDto[] | null;
     paginationOptions: PaginationOptionsType;
-  }): Promise<User[]> {
+  }): Promise<CountedResourceType<User>> {
     return this.usersRepository.findManyWithPagination({
       filterOptions,
       sortOptions,

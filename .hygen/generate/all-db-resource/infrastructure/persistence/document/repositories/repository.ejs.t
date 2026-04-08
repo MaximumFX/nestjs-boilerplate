@@ -10,6 +10,7 @@ import { <%= name %>Repository } from '../../<%= h.inflection.transform(name, ['
 import { <%= name %> } from '../../../../domain/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>';
 import { <%= name %>Mapper } from '../mappers/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>.mapper';
 import { PaginationOptionsType } from '../../../../../utils/types/pagination-options.type';
+import { CountedResourceType } from '../../../../../utils/types/counted-resource.type';
 
 @Injectable()
 export class <%= name %>DocumentRepository implements <%= name %>Repository {
@@ -29,15 +30,17 @@ export class <%= name %>DocumentRepository implements <%= name %>Repository {
     paginationOptions,
   }: {
     paginationOptions: PaginationOptionsType;
-  }): Promise<<%= name %>[]> {
+  }): Promise<CountedResourceType<<%= name %>>> {
     const entityObjects = await this.<%= h.inflection.camelize(name, true) %>Model
       .find()
       .skip(paginationOptions.skip)
       .limit(paginationOptions.limit);
+    const count = await this.<%= h.inflection.camelize(name, true) %>Model.countDocuments();
 
-    return entityObjects.map((entityObject) =>
-      <%= name %>Mapper.toDomain(entityObject),
-    );
+    return {
+      entities: entityObjects.map((entityObject) => <%= name %>Mapper.toDomain(entityObject)),
+      count,
+    };
   }
 
   async findById(id: <%= name %>['id']): Promise<NullableType<<%= name %>>> {

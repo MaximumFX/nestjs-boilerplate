@@ -4,6 +4,7 @@ import { PaginationOptionsType } from '../../../utils/types/pagination-options.t
 import { User } from '../../domain/user';
 
 import { FilterUserDto, SortUserDto } from '../../dto/query-user.dto';
+import { CountedResourceType } from '../../../utils/types/counted-resource.type';
 
 export abstract class UserRepository {
   abstract create(
@@ -18,7 +19,7 @@ export abstract class UserRepository {
     filterOptions?: FilterUserDto | null;
     sortOptions?: SortUserDto[] | null;
     paginationOptions: PaginationOptionsType;
-  }): Promise<User[]>;
+  }): Promise<CountedResourceType<User>>;
 
   abstract findById(id: User['id']): Promise<NullableType<User>>;
   abstract findByIds(ids: User['id'][]): Promise<User[]>;

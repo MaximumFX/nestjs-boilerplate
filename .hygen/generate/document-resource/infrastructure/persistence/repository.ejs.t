@@ -5,6 +5,7 @@ import { DeepPartial } from '../../../utils/types/deep-partial.type';
 import { NullableType } from '../../../utils/types/nullable.type';
 import { PaginationOptionsType } from '../../../utils/types/pagination-options.type';
 import { <%= name %> } from '../../domain/<%= h.inflection.transform(name, ['underscore', 'dasherize']) %>';
+import { CountedResourceType } from '../../../utils/types/counted-resource.type';
 
 export abstract class <%= name %>Repository {
   abstract create(
@@ -15,7 +16,7 @@ export abstract class <%= name %>Repository {
     paginationOptions,
   }: {
     paginationOptions: PaginationOptionsType;
-  }): Promise<<%= name %>[]>;
+  }): Promise<CountedResourceType<<%= name %>>>;
 
   abstract findById(id: <%= name %>['id']): Promise<NullableType<<%= name %>>>;
 
