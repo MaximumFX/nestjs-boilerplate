@@ -18,7 +18,7 @@ export function SecuredEndpoint() {
 }
 
 /**
- * Marks a route as public, allowing unauthenticated access.
+ * Marks a route as public, allowing unauthenticated access (with an API key).
  */
 export function Public() {
   return SetMetadata(IS_PUBLIC_KEY, true);
