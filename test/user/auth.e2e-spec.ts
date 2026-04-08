@@ -18,8 +18,8 @@ describe('Auth Module', () => {
   describe('Registration', () => {
     it('should fail with exists email: /api/v1/auth/email/register (POST)', () => {
       return request(app)
-        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .post('/api/v1/auth/email/register')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({
           email: TESTER_EMAIL,
           password: TESTER_PASSWORD,
@@ -34,8 +34,8 @@ describe('Auth Module', () => {
 
     it('should successfully: /api/v1/auth/email/register (POST)', async () => {
       return request(app)
-        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .post('/api/v1/auth/email/register')
+        .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
         .send({
           email: newUserEmail,
           password: newUserPassword,
@@ -48,8 +48,8 @@ describe('Auth Module', () => {
     describe('Login', () => {
       it('should successfully with unconfirmed email: /api/v1/auth/email/login (POST)', () => {
         return request(app)
-          .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
           .post('/api/v1/auth/email/login')
+          .set('x-api-key', process.env.PUBLIC_FRONTEND_API_KEY ?? 'test')
           .send({ email: newUserEmail, password: newUserPassword })
           .expect(200)
           .expect(({ body }) => {
