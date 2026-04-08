@@ -52,7 +52,7 @@ export class UsersDocumentRepository implements UserRepository {
           {},
         ),
       )
-      .skip((paginationOptions.page - 1) * paginationOptions.limit)
+      .skip(paginationOptions.skip)
       .limit(paginationOptions.limit);
 
     return userObjects.map((userObject) => UserMapper.toDomain(userObject));

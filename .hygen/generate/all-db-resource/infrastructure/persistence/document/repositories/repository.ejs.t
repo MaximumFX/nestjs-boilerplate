@@ -32,7 +32,7 @@ export class <%= name %>DocumentRepository implements <%= name %>Repository {
   }): Promise<<%= name %>[]> {
     const entityObjects = await this.<%= h.inflection.camelize(name, true) %>Model
       .find()
-      .skip((paginationOptions.page - 1) * paginationOptions.limit)
+      .skip(paginationOptions.skip)
       .limit(paginationOptions.limit);
 
     return entityObjects.map((entityObject) =>

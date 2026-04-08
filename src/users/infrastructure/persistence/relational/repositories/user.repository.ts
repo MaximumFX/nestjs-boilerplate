@@ -42,7 +42,7 @@ export class UsersRelationalRepository implements UserRepository {
     }
 
     const entities = await this.usersRepository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
+      skip: paginationOptions.skip,
       take: paginationOptions.limit,
       where: where,
       order: sortOptions?.reduce(

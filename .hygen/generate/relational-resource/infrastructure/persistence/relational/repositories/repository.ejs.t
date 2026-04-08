@@ -32,7 +32,7 @@ export class <%= name %>RelationalRepository implements <%= name %>Repository {
     paginationOptions: PaginationOptionsType;
   }): Promise<<%= name %>[]> {
     const entities = await this.<%= h.inflection.camelize(name, true) %>Repository.find({
-      skip: (paginationOptions.page - 1) * paginationOptions.limit,
+      skip: paginationOptions.skip,
       take: paginationOptions.limit,
     });
 
